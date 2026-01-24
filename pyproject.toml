@@ -1,0 +1,33 @@
+[project]
+name = "fintness-bot"
+version = "0.1.0"
+description = "Финтес бот в рамках учебного проекта"
+authors = [
+    {name = "Koshveptos",email = "kazakovvasilij1@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aiogram (>=3.13,<4.0)",
+    "sqlalchemy (>=2.0,<3.0)",
+    "aiosqlite (>=0.20,<0.21)",
+    "alembic (>=1.13,<2.0)",
+    "pydantic-settings (>=2.0,<3.0)",
+    "aiohttp (>=3.9,<4.0)",
+    "structlog (>=24.1,<25.0)",
+    "matplotlib (>=3.8,<4.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^9.0.2"
+pytest-asyncio = "^1.3.0"
+black = "^26.1.0"
+ruff = "^0.14.14"
+mypy = "^1.19.1"
+pre-commit = "^4.5.1"
+
