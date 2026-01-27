@@ -5,8 +5,10 @@ description = "Финтес бот в рамках учебного проект
 authors = [
     {name = "Koshveptos",email = "kazakovvasilij1@gmail.com"}
 ]
+
+
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 dependencies = [
     "aiogram (>=3.13,<4.0)",
     "sqlalchemy (>=2.0,<3.0)",
@@ -30,4 +32,3 @@ black = "^26.1.0"
 ruff = "^0.14.14"
 mypy = "^1.19.1"
 pre-commit = "^4.5.1"
-
