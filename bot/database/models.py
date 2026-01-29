@@ -13,7 +13,7 @@ class Base(DeclarativeBase):
 class GenderEnum(enum.Enum):
     MALE = "male"
     FEMALE = "female"
-    OTHER = "other"
+    OTHER = "other"  # ну мало ли
 
 
 class UserBase(Base):
