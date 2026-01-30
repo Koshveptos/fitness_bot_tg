@@ -1,9 +1,18 @@
-from sqlalchemy import select, update
+from datetime import date
+from sqlalchemy import func, select, update
 
 from sqlalchemy.orm import selectinload
 from typing import Optional, List
 from session import connection
-from .models import UserBase, GenderEnum
+from .models import FoodLog, UserBase, GenderEnum, WaterLog, WorkoutLog
+
+
+"""
+для воды, тренировки и еды пока что написаны будут операции создания и получение
+обновлять и удалять  записи как то безсмысленно на начальном этапке , но можно дописать потом если будет время, а то выйдет много кода)
+пока делаю mvp
+
+"""
 
 
 ###USER CRUD
@@ -118,3 +127,148 @@ async def get_user_by_city(session, city: str) -> List[UserBase]:
 #####
 # WATER LOOOGS
 #####
+
+
+@connection
+async def create_water_log(
+    session, user_id: int, amount: int, log_date: Optional[date] = None
+) -> WaterLog:
+    water_log = WaterLog(
+        user_id=user_id, amount=amount, log_date=log_date or date.today()
+    )
+    session.add(water_log)
+    return water_log
+
+
+@connection
+async def get_water_logs_by_user(session, user_id: int) -> List[WaterLog]:
+    result = await session.execute(
+        select(WaterLog)
+        .where(WaterLog.user_id == user_id)
+        .order_by(WaterLog.log_date.desc())
+    )
+    return list(result.scalars().all())
+
+
+@connection
+async def get_water_logs_by_date(
+    session, user_id: int, log_date: date
+) -> List[WaterLog]:
+    result = await session.execute(
+        select(WaterLog)
+        .where(WaterLog.user_id == user_id, WaterLog.log_date == log_date)
+        .order_by(WaterLog.id)
+    )
+    return list(result.scalars().all)
+
+
+@connection
+async def get_wather_log_by_date_range(
+    session, user_id: int, start_log: date, end_log: date
+) -> List[WaterLog]:
+    result = await session.execute(
+        select(WaterLog)
+        .where(
+            WaterLog.user_id == user_id,
+            WaterLog.log_date <= end_log,
+            WaterLog.log_date >= start_log,
+        )
+        .order_by(WaterLog.log_date, WaterLog.id)
+    )
+    return list(result.scalars().all())
+
+
+###############
+####писать много, и по идее апдейт и делит для воды то и не нужен, пользователь будет вносить, а удалять ему зачем (дописать если лень)
+#####
+
+
+###Foods logs
+
+
+@connection
+async def create_food_log(
+    session,
+    user_id: int,
+    food_name: str,
+    calories: int = 0,
+    log_date: Optional[date] = None,
+) -> FoodLog:
+    food_log = FoodLog(
+        user_id=user_id,
+        log_date=log_date or date.today(),
+        food_name=food_name,
+        calories=calories,
+    )
+    session.add(food_log)
+    return food_log
+
+
+@connection
+async def get_food_logs_by_user(session, user_id: int) -> List[FoodLog]:
+    result = await session.execute(
+        select(FoodLog)
+        .where(FoodLog.user_id == user_id)
+        .order_by(FoodLog.log_date.desc())
+    )
+    return list(result.scalars().all())
+
+
+@connection
+async def get_food_logs_by_date(session, user_id: int, log_date: date) -> List[FoodLog]:
+    result = await session.execute(
+        select(FoodLog)
+        .where(FoodLog.user_id == user_id, FoodLog.log_date == log_date)
+        .order_by(FoodLog.id)
+    )
+    return list(result.scalars().all())
+
+
+@connection
+async def get_food_logs_by_date_range(
+    session, user_id: int, start_log: date, end_log: date
+) -> List[FoodLog]:
+    result = await session.execute(
+        select(FoodLog)
+        .where(
+            FoodLog.user_id == user_id,
+            FoodLog.log_date >= start_log,
+            FoodLog.log_date <= end_log,
+        )
+        .order_by(FoodLog.log_date, FoodLog.id)
+    )
+    return list(result.scalars().all())
+
+
+@connection
+async def get_total_caloraes_by_date(session, user_id: int, log_date: date) -> int:
+    result = await session.execute(
+        select(func.sum(FoodLog.calories)).where(
+            FoodLog.user_id == user_id, FoodLog.log_date == log_date
+        )
+    )
+    total = result.scalar()
+    return 0 or total
+
+
+###workout logs
+
+
+@connection
+async def create_workout_log(
+    session,
+    user_id: int,
+    workout_type: str,
+    duration: int,
+    burned_calories: int = 0,
+    log_date: Optional[date] = None,
+) -> WorkoutLog:
+    workout_log = WorkoutLog(
+        user_id=user_id,
+        workout_type=workout_type,
+        duration=duration,
+        burned_calories=burned_calories,
+        log_date=log_date or date.today(),
+    )
+    session.add(workout_log)
+    return workout_log
