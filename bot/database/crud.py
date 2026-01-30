@@ -163,7 +163,7 @@ async def get_water_logs_by_date(
 
 
 @connection
-async def get_wather_log_by_date_range(
+async def get_water_log_by_date_range(
     session, user_id: int, start_log: date, end_log: date
 ) -> List[WaterLog]:
     result = await session.execute(
@@ -272,3 +272,129 @@ async def create_workout_log(
     )
     session.add(workout_log)
     return workout_log
+
+
+@connection
+async def get_workout_logs_by_user(session, user_id: int) -> List[WorkoutLog]:
+    result = await session.execute(
+        select(WorkoutLog)
+        .where(WaterLog.user_id == user_id)
+        .order_by(WaterLog.log_date.desc())
+    )
+    return list(result.scalars().all())
+
+
+###потом можно переделать или удалить, ибо ниже есть отдельно полная статистика за день
+### или оставить. тут просто сами записи. а ниже статистика
+###
+@connection
+async def get_workout_logs_by_date(
+    session, user_id: int, log_date: date
+) -> List[WorkoutLog]:
+    result = await session.execute(
+        select(WorkoutLog)
+        .where(WorkoutLog.user_id == user_id, WorkoutLog.log_date == log_date)
+        .order_by(WorkoutLog.id)
+    )
+    return list(result.scalars().all())
+
+
+@connection
+async def get_workout_logs_by_date_range(
+    session, user_id: int, start_date: date, end_date: date
+) -> List[WorkoutLog]:
+    result = await session.execute(
+        select(WorkoutLog)
+        .where(
+            WorkoutLog.user_id == user_id,
+            WorkoutLog.log_date >= start_date,
+            WorkoutLog.log_date <= end_date,
+        )
+        .order_by(WorkoutLog.log_date, WorkoutLog.id)
+    )
+    return list(result.scalars().all())
+
+
+@connection
+async def get_total_workout_status_by_date(
+    session, user_id: int, log_date: date
+) -> dict:
+    result = await session.execute(
+        select(
+            func.sum(WorkoutLog.duration),
+            func.sum(WorkoutLog.burned_calories),
+            func.count(WorkoutLog.id),
+        ).where(WorkoutLog.user_id == user_id, WorkoutLog.log_date == log_date)
+    )
+    duration, calories, count = result.first()
+    return {
+        "total_duration": duration or 0,
+        "total_calories": calories or 0,
+        "workout_count": count or 0,
+    }
+
+
+####чем дальеш пишу, тем больеш понимаю, что лучше потом или сразу переделать на Enam,
+@connection
+async def get_workout_by_type(
+    session, user_id: int, workout_type: str
+) -> List[WorkoutLog]:
+    result = await session.execute(
+        select(WorkoutLog)
+        .where(WorkoutLog.user_id == user_id, WorkoutLog.workout_type == workout_type)
+        .order_by(WorkoutLog.log_date.desc())
+    )
+    return list(result.scalars().all())
+
+
+####потом если будет кайф можно дописать удаление и обновленеи
+
+
+"""
+тут общие полезные круды, по типу общей статы за день или промежуток
+можно тоже потом дописать додумать
+
+"""
+
+
+###получение  полной статистики за дату
+@connection
+async def get_daily_summary(session, user_id: int, log_date: date) -> dict:
+    water_result = await session.execute(
+        select(func.sum(WaterLog.amount)).where(
+            WaterLog.user_id == user_id, WaterLog.log_date == log_date
+        )
+    )
+    water_total = water_result.scalar() or 0
+    food_result = await session.execute(
+        select(func.sum(FoodLog.calories)).where(
+            FoodLog.user_id == user_id, FoodLog.log_date == log_date
+        )
+    )
+    food_calories = food_result.scalar() or 0
+    workout_result = await session.execute(
+        select(
+            func.sum(WorkoutLog.duration), func.sum(WorkoutLog.burned_calories)
+        ).where(WorkoutLog.user_id == user_id, WorkoutLog.log_date == log_date)
+    )
+    workout_duration, workout_calories = workout_result.first()
+    return {
+        "date": log_date,
+        "water_ml": water_total,
+        "food_calories": food_calories,
+        "workout_duration_min": workout_duration or 0,
+        "workout_calories_burned": workout_calories or 0,
+        "net_calories": food_calories - (workout_calories or 0),
+    }
+
+
+##получить цели пользователя
+
+
+@connection
+async def get_user_goals(session, user_id: int) -> dict:
+    result = await session.execute(
+        select(UserBase.water_goal, UserBase.calorie_goal).where(UserBase.id == user_id)
+    )
+    water_goal, calorie_goal = result.first()
+    return {"water_goal": water_goal, "calorie_goal": calorie_goal}
