@@ -16,7 +16,5 @@ def connection(method):
             except Exception:
                 await session.rollback()
                 raise
-            # finally:
-            #     await session.close()
 
     return wrapper
