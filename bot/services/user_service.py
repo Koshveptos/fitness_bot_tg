@@ -18,7 +18,11 @@ async def register_or_get_user(
 
 
 async def update_user_profile(session, telegram_id: int, **kwargs) -> bool:
+    if not kwargs:
+        return False
+
     user = await get_user_by_telegram_id(session, telegram_id)
     if not user:
         return False
+
     return await update_user_by_id(session, user.id, **kwargs)

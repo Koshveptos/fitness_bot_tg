@@ -22,4 +22,4 @@ async def test_get_today_summary_with_data(async_session, test_user):
     assert summary["water_ml"] == 1200
     assert summary["food_calories"] == 400
     assert summary["burned_calories"] == 450
-    assert summary["net_calories"] == -50
+    assert summary["balance_calories"] == -50
