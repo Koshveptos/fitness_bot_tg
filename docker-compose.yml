@@ -1,0 +1,9 @@
+services:
+  fitness_bot:
+    build: .
+    container_name: fitness_bot
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+    environment:
+      TZ: Europe/Moscow

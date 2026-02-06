@@ -7,8 +7,15 @@ from bot.database.session import async_session_maker
 from bot.database.crud.summary import get_daily_summary
 
 
+from bot.services.user_service import get_user_by_telegram_id
+
+
 async def generate_progress_graph(telegram_id: int):
     async with async_session_maker() as session:
+        user = await get_user_by_telegram_id(session, telegram_id)
+        if not user:
+            return None
+
         labels = []
         water_data = []
         calorie_data = []
@@ -17,10 +24,10 @@ async def generate_progress_graph(telegram_id: int):
             day = date.today() - timedelta(days=i)
             labels.append(day.strftime("%d.%m"))
 
-            summary = await get_daily_summary(session, telegram_id, day)
+            summary = await get_daily_summary(session, user.id, day)
 
             water_data.append(summary["water_ml"])
-            calorie_data.append(summary["food_calories"] - summary["burned_calories"])
+            calorie_data.append(summary["net_calories"])
 
     fig, ax = plt.subplots(2, 1, figsize=(8, 8))
 
