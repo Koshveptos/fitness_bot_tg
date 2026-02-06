@@ -16,7 +16,7 @@ async def create_water_log(
 
 async def get_water_today(session, user_id: int) -> int:
     result = await session.execute(
-        select(func.sum(WaterLog.amount)).where(
+        select(func.coalesce(func.sum(WaterLog.amount), 0)).where(
             WaterLog.user_id == user_id, WaterLog.log_date == date.today()
         )
     )

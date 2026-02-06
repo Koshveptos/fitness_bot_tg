@@ -10,7 +10,8 @@ def connection(method):
     async def wrapper(*args, **kwargs):
         async with async_session_maker() as session:
             try:
-                result = await method(*args, session=session, **kwargs)
+                result = await method(session=session, *args, **kwargs)
+
                 await session.commit()
                 return result
             except Exception:

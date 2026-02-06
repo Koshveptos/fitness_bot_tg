@@ -23,7 +23,7 @@ async def create_food_log(
 
 async def get_food_calories_today(session, user_id: int) -> int:
     result = await session.execute(
-        select(func.sum(FoodLog.calories)).where(
+        select(func.coalesce(func.sum(FoodLog.calories), 0)).where(
             FoodLog.user_id == user_id, FoodLog.log_date == date.today()
         )
     )
@@ -65,7 +65,7 @@ async def get_food_logs_by_date_range(
 
 async def get_total_calories_by_date(session, user_id: int, log_date: date) -> int:
     result = await session.execute(
-        select(func.sum(FoodLog.calories)).where(
+        select(func.coalesce(func.sum(FoodLog.calories), 0)).where(
             FoodLog.user_id == user_id, FoodLog.log_date == log_date
         )
     )

@@ -42,7 +42,7 @@ async def create_user(
     return user
 
 
-async def get_user_by_telegram_id(
+async def get_user_by_telegram_id_crud(
     session,
     telegram_id: int,
     load_logs: bool = False,
@@ -64,7 +64,7 @@ async def get_or_create_user(
     username: Optional[str] = None,
     first_name: Optional[str] = None,
 ) -> UserBase:
-    user = await get_user_by_telegram_id(session, telegram_id)
+    user = await get_user_by_telegram_id_crud(session, telegram_id)
     if user:
         return user
     return await create_user(

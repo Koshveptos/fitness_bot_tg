@@ -5,13 +5,13 @@ from bot.database.models import FoodLog, UserBase, WaterLog, WorkoutLog
 
 async def get_daily_summary(session, user_id: int, log_date: date) -> dict:
     water_result = await session.execute(
-        select(func.sum(WaterLog.amount)).where(
+        select(func.coalesce(func.sum(WaterLog.amount), 0)).where(
             WaterLog.user_id == user_id, WaterLog.log_date == log_date
         )
     )
     water_total = water_result.scalar() or 0
     food_result = await session.execute(
-        select(func.sum(FoodLog.calories)).where(
+        select(func.coalesce(func.sum(FoodLog.calories), 0)).where(
             FoodLog.user_id == user_id, FoodLog.log_date == log_date
         )
     )

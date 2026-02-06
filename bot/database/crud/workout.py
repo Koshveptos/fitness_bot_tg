@@ -34,7 +34,7 @@ async def get_workout_logs_by_user(session, user_id: int) -> List[WorkoutLog]:
 
 async def get_workout_calories_today(session, user_id: int) -> int:
     result = await session.execute(
-        select(func.sum(WorkoutLog.burned_calories)).where(
+        select(func.coalesce(func.sum(WorkoutLog.burned_calories), 0)).where(
             WorkoutLog.user_id == user_id, WorkoutLog.log_date == date.today()
         )
     )
