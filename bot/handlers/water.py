@@ -12,7 +12,7 @@ router = Router()
 async def log_water(message: Message):
     parts = message.text.split()
     if len(parts) != 2 or not parts[1].isdigit():
-        await message.answer("Использование: /log_water <мл>")
+        await message.answer("Использование: /log_water мл")
         return
 
     amount = int(parts[1])

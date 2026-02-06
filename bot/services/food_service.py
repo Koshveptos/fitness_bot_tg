@@ -11,7 +11,7 @@ async def add_food(
         return None
 
     await create_food_log(session, user.id, food_name, calories)
-    await session.commit()  # ← ЭТО БЫЛО ГЛАВНОЕ!
+    await session.commit()
     return await get_food_calories_today(session, user.id)
 
 

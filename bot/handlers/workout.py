@@ -11,7 +11,7 @@ router = Router()
 async def log_workout(message: Message):
     parts = message.text.split()
     if len(parts) != 3 or not parts[2].isdigit():
-        await message.answer("Использование: /log_workout <тип> <минуты>")
+        await message.answer("Использование: /log_workout тип минуты")
         return
 
     workout_type = parts[1]

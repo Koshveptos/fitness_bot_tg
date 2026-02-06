@@ -15,7 +15,7 @@ router = Router()
 async def log_food(message: Message, state: FSMContext):
     args = message.text.split(maxsplit=1)
     if len(args) != 2:
-        await message.answer("Использование: /log_food <продукт>")
+        await message.answer("Использование: /log_food продукт")
         return
 
     product = args[1].strip()
