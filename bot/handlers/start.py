@@ -16,5 +16,5 @@ async def start_handler(message: Message):
         "/log_water - добавить воду\n"
         "/log_workout - добавить тренировку\n"
         "/check_progress - прогресс за сегодня\n"
-        "/graph - выведет графики  "
+        "/graph - выведет графики "
     )

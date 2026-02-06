@@ -33,7 +33,7 @@ async def main():
     dp.include_router(progress_router)
     dp.include_router(graph_router)
 
-    print("🤖 Бот запущен")
+    print(" Бот запущен")
     await dp.start_polling(bot, skip_updates=True)
 
 
